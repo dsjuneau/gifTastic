@@ -21,11 +21,24 @@ var topics = [
 ];
 
 function getGifs(veggie) {
-  requestURL = requestURL + veggie;
-  $.ajax({ url: requestURL, method: "GET" }).then(function(response) {
+  var finalURL = requestURL + veggie;
+  $.ajax({ url: finalURL, method: "GET" }).then(function(response) {
+    console.log(requestURL);
     console.log(response);
-    //Look at response
-    //Set up Gifs
+    for (var i = 0; i < 10; i++) {
+      var $gifHolder = $(".gif-holder");
+      var $newDiv = $("<div>").addClass("card col-sm-3 gif" + i);
+      var $newImg = $("<img>").addClass("card-img-top");
+      var $newDivBody = $("<div>").addClass("card-body");
+      var $newP = $("<p>").addClass("card-text");
+      $newImg.attr("src", response.data[i].images.downsized_still.url);
+      $newP.text(response.data[i].rating);
+      $newImg.appendTo($newDiv);
+      $newP.appendTo($newDivBody);
+      $newDivBody.appendTo($newDiv);
+      $newDiv.appendTo($gifHolder);
+      //Store URLs in an array.
+    }
   });
 }
 
