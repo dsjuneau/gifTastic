@@ -19,16 +19,21 @@ var topics = [
   "asparagus",
   "brussel-sprouts"
 ];
+var gifUrlArray = [];
+var toggleSwitch = true;
+var ext = 0;
 
+// Pull gifs, populate page, store urls in an array for later use
 function getGifs(veggie) {
   var finalURL = requestURL + veggie;
   $.ajax({ url: finalURL, method: "GET" }).then(function(response) {
-    console.log(requestURL);
     console.log(response);
     for (var i = 0; i < 10; i++) {
       var $gifHolder = $(".gif-holder");
-      var $newDiv = $("<div>").addClass("card col-sm-3 gif" + i);
+      var $newDiv = $("<div>").addClass("card col-sm-3");
+      $newDiv.attr("value", i + ext);
       var $newImg = $("<img>").addClass("card-img-top");
+      $newImg.attr("data-id", i + ext);
       var $newDivBody = $("<div>").addClass("card-body");
       var $newP = $("<p>").addClass("card-text");
       $newImg.attr("src", response.data[i].images.downsized_still.url);
@@ -36,20 +41,60 @@ function getGifs(veggie) {
       $newImg.appendTo($newDiv);
       $newP.appendTo($newDivBody);
       $newDivBody.appendTo($newDiv);
-      $newDiv.appendTo($gifHolder);
+      $gifHolder.prepend($newDiv);
+      gifUrlArray[i + ext] = [
+        response.data[i].images.downsized_still.url,
+        response.data[i].images.original.webp
+      ];
       //Store URLs in an array.
     }
+    ext += 10;
   });
 }
 
-$(document).ready(function() {
+// Toggle between gif and still image
+function toggleGif(gifId) {
+  var currentUrl = $("[data-id=" + gifId + "]").attr("src");
+
+  if (currentUrl.includes("s.gif")) {
+    $("[data-id=" + gifId + "]").attr("src", gifUrlArray[parseInt(gifId)][1]);
+  } else {
+    $("[data-id=" + gifId + "]").attr("src", gifUrlArray[parseInt(gifId)][0]);
+  }
+}
+
+function populateButtons() {
   for (var i = 0; i < topics.length; i++) {
     var $newButton = $("<button>").text(topics[i]);
     $newButton.addClass("btn btn-success btn-sm veggie mr-2 my-2");
     $newButton.attr("value", topics[i]);
     $newButton.appendTo($(".button-holder"));
   }
-  $(".veggie").on("click", function() {
+}
+
+// Main Program
+
+$(document).ready(function() {
+  populateButtons();
+  $(document.body).on("click", ".veggie", function() {
     getGifs($(this).attr("value"));
+  });
+
+  $("#addVeggie").click(function(e) {
+    e.preventDefault();
+    var veggie = $("input")
+      .val()
+      .trim();
+
+    if (veggie !== "") {
+      topics.push(veggie);
+      $(".button-holder").empty();
+      populateButtons();
+      $("input").val("");
+    }
+  });
+
+  $(document.body).on("click", ".card", function() {
+    toggleGif($(this).attr("value"));
   });
 });
