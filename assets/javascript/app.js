@@ -36,17 +36,26 @@ function getGifs(veggie) {
       $newImg.attr("data-id", i + ext);
       var $newDivBody = $("<div>").addClass("card-body");
       var $newP = $("<p>").addClass("card-text");
+      var $newP1 = $("<p>").addClass("card-text");
+      var $newP2 = $("<p>").addClass("card-text");
       $newImg.attr("src", response.data[i].images.downsized_still.url);
-      $newP.text(response.data[i].rating);
+      $newP.text("Rating: " + response.data[i].rating);
+      $newP1.text("Title: " + response.data[i].title);
+      if (response.data[i].username === "") {
+        $newP2.text("Username: Unknown");
+      } else {
+        $newP2.text("Username: " + response.data[i].username);
+      }
       $newImg.appendTo($newDiv);
       $newP.appendTo($newDivBody);
+      $newP1.appendTo($newDivBody);
+      $newP2.appendTo($newDivBody);
       $newDivBody.appendTo($newDiv);
       $gifHolder.prepend($newDiv);
       gifUrlArray[i + ext] = [
         response.data[i].images.downsized_still.url,
         response.data[i].images.original.webp
       ];
-      //Store URLs in an array.
     }
     ext += 10;
   });
